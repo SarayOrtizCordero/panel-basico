@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Inventario — Básico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.11-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.79 0z"></path><polyline points="2.32 6.16 12 11 21.68 6.16"></polyline><line x1="12" y1="22.76" x2="12" y2="11"></line></svg>
+      </span>
+      <h1>Panel de Inventario</h1>
+    </div>
+    <span class="badge-plan">Básico</span>
+  </header>
+
+  <section class="dashboard">
+    <div class="card card-stat">
+      <div class="stat-icon stat-icon--total">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total de productos</span>
+        <span class="stat-value" id="totalProductos">0</span>
+      </div>
+    </div>
+
+    <div class="card card-stat">
+      <div class="stat-icon stat-icon--ok">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Listos para vender</span>
+        <span class="stat-value" id="totalListos">0</span>
+      </div>
+    </div>
+
+    <div class="card card-chart">
+      <div class="chart-wrap">
+        <svg viewBox="0 0 120 120" class="donut">
+          <circle class="donut-bg" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-fg" id="donutFg" cx="60" cy="60" r="50"></circle>
+        </svg>
+        <div class="donut-center">
+          <span id="donutPercent">0%</span>
+          <small>Disponible</small>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><i class="dot dot--ok"></i>Listos</span>
+        <span class="legend-item"><i class="dot dot--low"></i>Stock bajo</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="table-section">
+    <div class="table-header">
+      <h2>Productos</h2>
+      <span class="table-sub">Gestiona el stock en tiempo real</span>
+    </div>
+    <div class="table-wrap">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th class="col-photo"></th>
+            <th>Producto</th>
+            <th>SKU</th>
+            <th>Stock</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
