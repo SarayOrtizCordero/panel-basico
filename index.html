@@ -63,8 +63,14 @@
 
   <section class="table-section">
     <div class="table-header">
-      <h2>Productos</h2>
-      <span class="table-sub">Gestiona el stock en tiempo real</span>
+      <div class="table-header-text">
+        <h2>Productos</h2>
+        <span class="table-sub">Gestiona el stock en tiempo real</span>
+      </div>
+      <button class="btn-add-product" id="addProductOpenBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Añadir producto
+      </button>
     </div>
     <div class="table-wrap">
       <table class="products-table">
@@ -83,6 +89,62 @@
   </section>
 
 </div>
+
+<!-- Modal: Reponer stock -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 id="restockTitle">Producto</h3>
+        <p class="modal-sub">Registra la entrada de mercancía</p>
+      </div>
+      <button class="modal-close" id="restockClose" aria-label="Cerrar">&times;</button>
+    </div>
+    <form class="modal-form" id="restockForm">
+      <div class="field">
+        <label class="field-label" for="restockQty">Unidades a añadir</label>
+        <input class="field-input" type="number" id="restockQty" min="1" step="1" value="10" required>
+      </div>
+      <button type="submit" class="btn-primary">Añadir stock</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Añadir producto -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3>Añadir producto</h3>
+        <p class="modal-sub">Da de alta un producto nuevo en el inventario</p>
+      </div>
+      <button class="modal-close" id="addProductClose" aria-label="Cerrar">&times;</button>
+    </div>
+    <form class="modal-form" id="addProductForm">
+      <div class="field">
+        <label class="field-label" for="newProductNombre">Nombre</label>
+        <input class="field-input" type="text" id="newProductNombre" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="newProductSku">SKU</label>
+          <input class="field-input" type="text" id="newProductSku" required>
+        </div>
+        <div class="field">
+          <label class="field-label" for="newProductStockMinimo">Stock mínimo</label>
+          <input class="field-input" type="number" id="newProductStockMinimo" min="0" step="1" value="5" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="newProductStock">Stock inicial</label>
+        <input class="field-input" type="number" id="newProductStock" min="0" step="1" value="0" required>
+      </div>
+      <button type="submit" class="btn-primary">Añadir producto</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
