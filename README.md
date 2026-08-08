@@ -59,5 +59,5 @@ para que la alerta de stock bajo sea visible nada más cargar.
   `.mi-clase { display: flex }` gana sobre `[hidden]` y lo deja visible
   igualmente. Si necesitas ambos, añade `.mi-clase[hidden] { display: none; }`.
 - No hay pestaña de proveedores, variantes ni importación — eso empieza en
-  el nivel [`intermedio/`](../intermedio/README.md). Este nivel está pensado
+  el nivel [`intermedio/`](https://github.com/SarayOrtizCordero/panel-intermedio/blob/main/README.md). Este nivel está pensado
   para quedarse simple a propósito.
