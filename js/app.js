@@ -50,7 +50,17 @@ function renderRow(p, index) {
 
 function renderTable() {
   productsBody.innerHTML = "";
+
+  if (PRODUCTS.length === 0) {
+    productsBody.innerHTML = '<tr><td colspan="5" class="table-loading">Todavía no hay productos. Añade el primero con "Añadir producto".</td></tr>';
+    return;
+  }
+
   PRODUCTS.forEach((p, index) => productsBody.appendChild(renderRow(p, index)));
+}
+
+function showLoadingState() {
+  productsBody.innerHTML = '<tr><td colspan="5" class="table-loading">Cargando productos…</td></tr>';
 }
 
 function updateDashboard() {
@@ -85,9 +95,21 @@ function changeStock(id, delta) {
   const product = PRODUCTS.find((p) => p.id === id);
   if (!product) return;
 
-  product.stock = Math.max(0, product.stock + delta);
+  const previousStock = product.stock;
+  const newStock = Math.max(0, product.stock + delta);
+  if (newStock === previousStock) return;
+
+  product.stock = newStock;
   updateRow(product);
   updateDashboard();
+
+  updateProductStock(id, newStock).catch((error) => {
+    console.error(error);
+    product.stock = previousStock;
+    updateRow(product);
+    updateDashboard();
+    showToast("No se pudo guardar el cambio de stock. Inténtalo de nuevo.", "error");
+  });
 }
 
 productsBody.addEventListener("click", (event) => {
@@ -178,7 +200,7 @@ function closeAddProductModal() {
   addProductModal.classList.remove("open");
 }
 
-addProductForm.addEventListener("submit", (event) => {
+addProductForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const nombre = document.getElementById("newProductNombre").value.trim();
   const sku = document.getElementById("newProductSku").value.trim();
@@ -186,13 +208,23 @@ addProductForm.addEventListener("submit", (event) => {
   const stockMinimo = Math.max(0, Number(document.getElementById("newProductStockMinimo").value));
   if (!nombre || !sku) return;
 
-  const id = PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0) + 1;
-  PRODUCTS.push({ id, nombre, sku, stock, stockMinimo });
+  const submitBtn = addProductForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
 
-  renderTable();
-  updateDashboard();
-  closeAddProductModal();
-  showToast(`${nombre} añadido al inventario`, "ok");
+  try {
+    const product = await insertProduct({ nombre, sku, stock, stockMinimo });
+    PRODUCTS.push(product);
+    renderTable();
+    updateDashboard();
+    closeAddProductModal();
+    showToast(`${nombre} añadido al inventario`, "ok");
+  } catch (error) {
+    console.error(error);
+    const message = error.code === "23505" ? "Ya existe un producto con ese SKU." : "No se pudo añadir el producto. Inténtalo de nuevo.";
+    showToast(message, "error");
+  } finally {
+    submitBtn.disabled = false;
+  }
 });
 
 document.getElementById("addProductOpenBtn").addEventListener("click", openAddProductModal);
@@ -201,11 +233,20 @@ addProductModal.addEventListener("click", (event) => {
   if (event.target === addProductModal) closeAddProductModal();
 });
 
-renderTable();
-
-// Doble rAF para forzar un frame de pintado antes de animar el donut
-requestAnimationFrame(() => {
-  requestAnimationFrame(() => {
-    updateDashboard();
-  });
-});
+// --- Carga inicial (se dispara desde auth.js tras iniciar sesión) ---
+async function initApp() {
+  showLoadingState();
+  try {
+    await fetchProducts();
+    renderTable();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        updateDashboard();
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    productsBody.innerHTML = '<tr><td colspan="5" class="table-loading">No se pudieron cargar los productos. Recarga la página.</td></tr>';
+    showToast("No se pudieron cargar los productos.", "error");
+  }
+}
