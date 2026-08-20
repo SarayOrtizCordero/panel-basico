@@ -3,9 +3,9 @@
      el tono original, usado tal cual como texto o fondo de botón, no
      alcanza el contraste mínimo de accesibilidad (WCAG AA 4.5:1) sobre
      fondos claros — ver notas al final del archivo. */
-  --primary: #a83610;
+  --primary: #b64211;
   --primary-strong: #df3314;
-  --primary-soft: rgba(251, 123, 21, 0.12);
+  --primary-soft: rgba(251, 123, 21, 0.08);
   --on-primary: #ffffff;
   --danger: #b11e1b;
   --danger-soft: rgba(177, 30, 27, 0.1);
@@ -813,7 +813,7 @@ body {
    El naranja claro de marca (#fb7b15) tal cual, usado como texto o como
    fondo de botón con texto blanco, no llega a 4.5:1 sobre fondos claros
    (ratio real ≈ 2.6–2.8:1). Por eso --primary en claro usa una variante
-   más oscura (#a83610) derivada de ese mismo naranja, y el naranja y rojo
+   más oscura (#b64211) derivada de ese mismo naranja, y el naranja y rojo
    originales del cliente (#fb7b15, #df3314) se reservan para degradados
    decorativos, estados hover y el tema oscuro (donde sí funcionan como
    texto/icono, con texto oscuro en vez de blanco encima — ver --on-primary). */

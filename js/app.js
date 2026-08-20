@@ -5,9 +5,8 @@ const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 const productsBody = document.getElementById("productsBody");
 
 function getInitials(nombre) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
+  const words = nombre.match(/[\p{L}\p{N}]+/gu) || [];
+  return words
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
