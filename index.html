@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de Inventario — Básico</title>
 <script>
-  // Aplica el tema guardado (o el del sistema) antes de pintar, para evitar
-  // un parpadeo del tema equivocado al cargar la página.
+  // Aplica el tema guardado antes de pintar, para evitar un parpadeo del
+  // tema equivocado al cargar la página. Por defecto siempre es claro,
+  // independientemente del tema del sistema operativo, hasta que el
+  // usuario elija oscuro explícitamente con el botón de la cabecera.
   (function () {
     try {
       var stored = localStorage.getItem("panelbasico-theme");
-      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.setAttribute("data-theme", stored === "dark" ? "dark" : "light");
     } catch (e) {
       document.documentElement.setAttribute("data-theme", "light");
     }
