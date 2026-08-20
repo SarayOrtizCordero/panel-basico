@@ -1,3 +1,16 @@
+// Escapa texto antes de insertarlo en innerHTML — nombre y SKU vienen de
+// datos guardados por usuarios (o de la base de datos), nunca deben tratarse
+// como HTML de confianza.
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+}
+
 // Acceso a datos vía Supabase. PRODUCTS vive en memoria como caché local
 // (así el resto de app.js no cambia) pero la fuente real es la tabla
 // "products" — ver supabase/schema.sql.

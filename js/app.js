@@ -26,22 +26,24 @@ function renderRow(p, index) {
   tr.dataset.id = p.id;
   tr.style.animationDelay = `${0.35 + index * 0.04}s`;
 
+  const safeNombre = escapeHtml(p.nombre);
+
   tr.innerHTML = `
     <td class="col-photo">
-      <div class="avatar ${colorClass}">${getInitials(p.nombre)}</div>
+      <div class="avatar ${colorClass}">${escapeHtml(getInitials(p.nombre))}</div>
     </td>
     <td>
-      <div class="product-name">${p.nombre}</div>
+      <div class="product-name">${safeNombre}</div>
       <span class="low-badge"><i class="low-dot"></i>¡Stock Bajo!</span>
     </td>
-    <td class="sku">${p.sku}</td>
+    <td class="sku">${escapeHtml(p.sku)}</td>
     <td><span class="stock-value" id="stock-${p.id}">${p.stock}</span></td>
     <td class="col-actions">
-      <button class="btn-restock" data-id="${p.id}" aria-label="Reponer stock de ${p.nombre}" title="Reponer stock">
+      <button class="btn-restock" data-id="${p.id}" aria-label="Reponer stock de ${safeNombre}" title="Reponer stock">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><line x1="10" y1="12" x2="14" y2="12"></line><line x1="12" y1="10" x2="12" y2="14"></line></svg>
       </button>
-      <button class="btn-qty btn-minus" data-id="${p.id}" data-action="dec" aria-label="Restar unidad de ${p.nombre}">−</button>
-      <button class="btn-qty btn-plus" data-id="${p.id}" data-action="inc" aria-label="Sumar unidad de ${p.nombre}">+</button>
+      <button class="btn-qty btn-minus" data-id="${p.id}" data-action="dec" aria-label="Restar unidad de ${safeNombre}">−</button>
+      <button class="btn-qty btn-plus" data-id="${p.id}" data-action="inc" aria-label="Sumar unidad de ${safeNombre}">+</button>
     </td>
   `;
 

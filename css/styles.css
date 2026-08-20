@@ -1,10 +1,15 @@
 :root {
-  --primary: #fb7b15;
+  /* --primary es una variante más oscura del naranja de marca (#fb7b15):
+     el tono original, usado tal cual como texto o fondo de botón, no
+     alcanza el contraste mínimo de accesibilidad (WCAG AA 4.5:1) sobre
+     fondos claros — ver notas al final del archivo. */
+  --primary: #a83610;
   --primary-strong: #df3314;
   --primary-soft: rgba(251, 123, 21, 0.12);
+  --on-primary: #ffffff;
   --danger: #b11e1b;
   --danger-soft: rgba(177, 30, 27, 0.1);
-  --ok: #5f8d3e;
+  --ok: #3f6b28;
   --ok-soft: rgba(95, 141, 62, 0.12);
 
   --bg: #f8f4e9;
@@ -21,10 +26,15 @@
 }
 
 :root[data-theme="dark"] {
+  /* En oscuro el naranja original SÍ funciona bien como texto/icono (va
+     sobre fondos oscuros), así que aquí --primary es el tono vivo y los
+     botones usan --on-primary oscuro en vez de blanco para mantener el
+     contraste — ver notas al final del archivo. */
   --primary: #fb7b15;
   --primary-strong: #ff9a4d;
   --primary-soft: rgba(251, 123, 21, 0.18);
-  --danger: #e2453f;
+  --on-primary: #241608;
+  --danger: #ff7168;
   --danger-soft: rgba(226, 69, 63, 0.16);
   --ok: #7cab5a;
   --ok-soft: rgba(124, 171, 90, 0.16);
@@ -118,7 +128,9 @@ body {
   height: 56px;
   margin: 0 auto 18px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  /* Degradado fijo con los dos naranjas de marca tal cual — es un icono
+     decorativo (exento del contraste de texto), así que no usa --primary. */
+  background: linear-gradient(135deg, #fb7b15, #df3314);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -632,7 +644,7 @@ body {
   align-items: center;
   gap: 8px;
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
   border: none;
   font-family: inherit;
   font-size: 13.5px;
@@ -756,7 +768,7 @@ body {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
   border: none;
   font-family: inherit;
   font-size: 14px;
@@ -791,8 +803,20 @@ body {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-.toast--ok { background: var(--ok); }
-.toast--error { background: var(--danger); }
+/* Fijos igual que el fondo del toast: el texto siempre es blanco, así que
+   estos dos tonos no pueden depender de --ok/--danger (varían por tema y
+   en oscuro son demasiado claros para texto blanco encima). */
+.toast--ok { background: #3f6b28; }
+.toast--error { background: #b11e1b; }
+
+/* Notas de contraste (WCAG AA, ratio ≥ 4.5:1 para texto):
+   El naranja claro de marca (#fb7b15) tal cual, usado como texto o como
+   fondo de botón con texto blanco, no llega a 4.5:1 sobre fondos claros
+   (ratio real ≈ 2.6–2.8:1). Por eso --primary en claro usa una variante
+   más oscura (#a83610) derivada de ese mismo naranja, y el naranja y rojo
+   originales del cliente (#fb7b15, #df3314) se reservan para degradados
+   decorativos, estados hover y el tema oscuro (donde sí funcionan como
+   texto/icono, con texto oscuro en vez de blanco encima — ver --on-primary). */
 
 /* Responsive */
 @media (max-width: 720px) {
