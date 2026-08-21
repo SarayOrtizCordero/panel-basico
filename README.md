@@ -25,6 +25,9 @@ más el SDK de Supabase cargado por CDN.
   panel.
 - **Eliminar producto:** botón de papelera en cada fila, con confirmación
   antes de borrar de verdad en la base de datos.
+- **Importar desde Excel (simulado):** botón que abre un modal, simula la
+  subida de un archivo con una barra de progreso de ~2s y **inserta de
+  verdad** entre 15 y 20 productos generados en la base de datos.
 - **Alerta de stock bajo:** cuando `stock <= stockMinimo`, la fila muestra un
   borde izquierdo rojo pulsante y la insignia "¡Stock Bajo!".
 
@@ -75,10 +78,11 @@ basico/
 └── js/
     ├── config.js           URL y anon key de tu proyecto Supabase (a rellenar)
     ├── supabaseClient.js   Inicializa el cliente ("db")
-    ├── data.js              fetch/insert/update de productos contra Supabase
+    ├── data.js              fetch/insert/update/delete de productos contra Supabase
     ├── auth.js              Login, logout y qué pantalla se muestra
     ├── theme.js              Toggle de modo claro/oscuro
-    └── app.js                Render de la tabla, dashboard y eventos
+    ├── app.js                Render de la tabla, dashboard y eventos
+    └── import.js             Simulación de importación desde Excel
 ```
 
 ## Notas para extender
