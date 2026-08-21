@@ -22,12 +22,15 @@ function nextImportSku() {
   return `IMP-${importCounter.toString(36).toUpperCase()}`;
 }
 
+let importRun = 0;
+
 function openImportModal() {
   showImportState("idle");
   importModal.classList.add("open");
 }
 
 function closeImportModal() {
+  importRun++;
   importModal.classList.remove("open");
 }
 
@@ -38,6 +41,7 @@ function showImportState(state) {
 }
 
 function startImport() {
+  const run = ++importRun;
   showImportState("progress");
   importProgressBar.style.width = "0%";
   importProgressText.textContent = "0%";
@@ -46,6 +50,8 @@ function startImport() {
   const start = performance.now();
 
   function step(now) {
+    if (run !== importRun) return;
+
     const elapsed = now - start;
     const pct = Math.min(100, Math.round((elapsed / duration) * 100));
     importProgressBar.style.width = `${pct}%`;
@@ -54,7 +60,7 @@ function startImport() {
     if (elapsed < duration) {
       requestAnimationFrame(step);
     } else {
-      finishImport();
+      finishImport(run);
     }
   }
 
@@ -77,18 +83,23 @@ function generateFakeProducts(n) {
   return products;
 }
 
-async function finishImport() {
+async function finishImport(run) {
+  if (run !== importRun) return;
+
   const count = Math.floor(Math.random() * 6) + 15; // 15–20 productos
   const generated = generateFakeProducts(count);
 
   try {
     const added = await insertProductsBatch(generated);
+    if (run !== importRun) return; // el usuario cerró el modal mientras se insertaba
+
     PRODUCTS.push(...added);
 
     importSuccessCount.textContent = added.length;
     showImportState("success");
 
     setTimeout(() => {
+      if (run !== importRun) return;
       closeImportModal();
       renderTable();
       updateDashboard();
@@ -96,14 +107,20 @@ async function finishImport() {
     }, 900);
   } catch (error) {
     console.error(error);
+    if (run !== importRun) return;
     showImportState("idle");
-    showToast("No se pudo completar la importación. Inténtalo de nuevo.", "error");
+    const message = error.code === "23505" ? "Ya existe un producto con ese SKU. Inténtalo de nuevo." : "No se pudo completar la importación. Inténtalo de nuevo.";
+    showToast(message, "error");
   }
 }
 
 document.getElementById("importOpenBtn").addEventListener("click", openImportModal);
 document.getElementById("importCloseBtn").addEventListener("click", closeImportModal);
-importStartBtn.addEventListener("click", startImport);
+importStartBtn.addEventListener("click", () => {
+  const confirmed = window.confirm("¿Importar productos de ejemplo? Esto añadirá productos nuevos de verdad al inventario.");
+  if (!confirmed) return;
+  startImport();
+});
 importModal.addEventListener("click", (event) => {
   if (event.target === importModal) closeImportModal();
 });
