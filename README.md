@@ -23,6 +23,8 @@ más el SDK de Supabase cargado por CDN.
   conexión).
 - **Añadir producto:** da de alta artículos nuevos directamente desde el
   panel.
+- **Eliminar producto:** botón de papelera en cada fila, con confirmación
+  antes de borrar de verdad en la base de datos.
 - **Alerta de stock bajo:** cuando `stock <= stockMinimo`, la fila muestra un
   borde izquierdo rojo pulsante y la insignia "¡Stock Bajo!".
 
@@ -44,6 +46,19 @@ más el SDK de Supabase cargado por CDN.
    - **anon / public key**
 6. Pégalos en [`js/config.js`](js/config.js), sustituyendo los marcadores
    `TU-PROYECTO` y `TU-ANON-KEY`.
+
+> **Si ya tenías este proyecto Supabase creado antes de añadir el borrado de
+> productos:** `schema.sql` no se vuelve a ejecutar solo. Ve a **SQL Editor**
+> y ejecuta únicamente esto una vez:
+>
+> ```sql
+> create policy "Usuarios autenticados pueden eliminar productos"
+>   on public.products for delete
+>   to authenticated
+>   using (true);
+>
+> grant delete on public.products to authenticated;
+> ```
 
 Con eso, abrir `index.html` (con doble clic o sirviéndolo con
 `python -m http.server 8000`) ya pide login y lee/escribe en Supabase.

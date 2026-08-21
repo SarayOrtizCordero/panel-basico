@@ -30,8 +30,13 @@ create policy "Usuarios autenticados pueden actualizar productos"
   using (true)
   with check (true);
 
+create policy "Usuarios autenticados pueden eliminar productos"
+  on public.products for delete
+  to authenticated
+  using (true);
+
 grant usage on schema public to authenticated;
-grant select, insert, update on public.products to authenticated;
+grant select, insert, update, delete on public.products to authenticated;
 
 -- Datos de ejemplo (los mismos 10 productos de la demo original).
 -- Seguro de re-ejecutar: si el SKU ya existe, no duplica la fila.
