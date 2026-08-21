@@ -105,6 +105,9 @@ basico/
 - La anon key en `js/config.js` está pensada para ir en el navegador — no es
   un secreto por sí sola. Quien de verdad protege los datos es la Row Level
   Security del esquema (`to authenticated`), no la key.
-- No hay pestaña de proveedores, variantes ni importación — eso empieza en
-  el nivel [`intermedio/`](https://github.com/SarayOrtizCordero/panel-intermedio/blob/main/README.md). Este nivel está pensado
+- No hay pestaña de proveedores ni variantes — eso empieza en el nivel
+  [`intermedio/`](https://github.com/SarayOrtizCordero/panel-intermedio/blob/main/README.md).
+  La importación desde Excel de este nivel es una simulación (ver
+  Funcionalidades); intermedio añade además proveedores y variantes reales.
+  Este nivel está pensado
   para quedarse simple a propósito.
