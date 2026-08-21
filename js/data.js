@@ -53,3 +53,8 @@ async function insertProduct({ nombre, sku, stock, stockMinimo }) {
   if (error) throw error;
   return mapRow(data);
 }
+
+async function deleteProduct(id) {
+  const { error } = await db.from("products").delete().eq("id", id);
+  if (error) throw error;
+}

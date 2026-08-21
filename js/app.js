@@ -43,6 +43,9 @@ function renderRow(p, index) {
       </button>
       <button class="btn-qty btn-minus" data-id="${p.id}" data-action="dec" aria-label="Restar unidad de ${safeNombre}">−</button>
       <button class="btn-qty btn-plus" data-id="${p.id}" data-action="inc" aria-label="Sumar unidad de ${safeNombre}">+</button>
+      <button class="btn-delete" data-id="${p.id}" aria-label="Eliminar ${safeNombre}" title="Eliminar producto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      </button>
     </td>
   `;
 
@@ -113,10 +116,41 @@ function changeStock(id, delta) {
   });
 }
 
+async function removeProduct(id) {
+  const product = PRODUCTS.find((p) => p.id === id);
+  if (!product) return;
+
+  const confirmed = window.confirm(`¿Eliminar "${product.nombre}"? Esta acción no se puede deshacer.`);
+  if (!confirmed) return;
+
+  const row = productsBody.querySelector(`tr[data-id="${id}"]`);
+  const deleteBtn = row ? row.querySelector(".btn-delete") : null;
+  if (deleteBtn) deleteBtn.disabled = true;
+
+  try {
+    await deleteProduct(id);
+    PRODUCTS = PRODUCTS.filter((p) => p.id !== id);
+    if (row) row.remove();
+    if (PRODUCTS.length === 0) renderTable();
+    updateDashboard();
+    showToast(`${product.nombre} eliminado del inventario`, "ok");
+  } catch (error) {
+    console.error(error);
+    if (deleteBtn) deleteBtn.disabled = false;
+    showToast("No se pudo eliminar el producto. Inténtalo de nuevo.", "error");
+  }
+}
+
 productsBody.addEventListener("click", (event) => {
   const restockBtn = event.target.closest(".btn-restock");
   if (restockBtn) {
     openRestockModal(Number(restockBtn.dataset.id));
+    return;
+  }
+
+  const deleteBtn = event.target.closest(".btn-delete");
+  if (deleteBtn) {
+    removeProduct(Number(deleteBtn.dataset.id));
     return;
   }
 
