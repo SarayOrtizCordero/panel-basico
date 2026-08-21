@@ -55,6 +55,9 @@ async function insertProduct({ nombre, sku, stock, stockMinimo }) {
 }
 
 async function deleteProduct(id) {
-  const { error } = await db.from("products").delete().eq("id", id);
+  const { data, error } = await db.from("products").delete().eq("id", id).select("id");
   if (error) throw error;
+  if (!data || data.length === 0) {
+    throw new Error("No se pudo eliminar el producto: no se encontró o no tienes permiso.");
+  }
 }
