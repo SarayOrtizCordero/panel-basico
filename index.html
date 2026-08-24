@@ -244,7 +244,7 @@
 
 <!-- Modal: Importación Excel -->
 <div class="modal-overlay" id="importModal">
-  <div class="modal">
+  <div class="modal modal--wide">
     <div class="modal-header">
       <div>
         <h3>Importar desde Excel</h3>
@@ -254,27 +254,66 @@
     </div>
 
     <div class="import-state" id="importIdleState">
-      <div class="file-card">
+      <label class="file-card" for="importFileInput">
         <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         <div class="file-info">
-          <span class="file-name">inventario.xlsx</span>
-          <span class="file-meta">96 KB</span>
+          <span class="file-name" id="importFileName">Ningún archivo seleccionado</span>
+          <span class="file-meta">.xlsx, .xls o .csv</span>
+        </div>
+      </label>
+      <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" hidden>
+      <p class="import-error" id="importFileError" hidden></p>
+    </div>
+
+    <div class="import-state" id="importMappingState" hidden>
+      <p class="progress-label">Indica qué columna es cada dato:</p>
+      <div class="mapping-list" id="mappingList"></div>
+      <div class="field">
+        <span class="field-label">Al actualizar productos que ya existen</span>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="mergeMode" value="replace" checked>
+            Sustituir su stock
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="mergeMode" value="sum">
+            Sumar al stock actual
+          </label>
         </div>
       </div>
-      <button class="btn-primary" id="importStartBtn">Subir archivo</button>
+      <button class="btn-primary" id="mappingContinueBtn" disabled>Continuar</button>
+    </div>
+
+    <div class="import-state" id="importPreviewState" hidden>
+      <p class="preview-summary" id="previewSummary"></p>
+      <div class="table-wrap preview-table-wrap">
+        <table class="products-table preview-table">
+          <thead>
+            <tr><th>Nombre</th><th>SKU</th><th>Stock</th><th>Stock mínimo</th></tr>
+          </thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+      <div class="preview-errors" id="previewErrors" hidden></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="previewBackBtn">Volver</button>
+        <button class="btn-primary" id="previewConfirmBtn">Confirmar importación</button>
+      </div>
     </div>
 
     <div class="import-state" id="importProgressState" hidden>
-      <p class="progress-label">Procesando archivo…</p>
+      <p class="progress-label" id="importProgressLabel">Importando…</p>
       <div class="progress-track">
         <div class="progress-fill" id="importProgressBar"></div>
       </div>
       <span class="progress-pct" id="importProgressText">0%</span>
     </div>
 
-    <div class="import-state import-success" id="importSuccessState" hidden>
+    <div class="import-state import-success" id="importResultState" hidden>
       <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-      <p><strong id="importSuccessCount">18</strong> productos importados correctamente</p>
+      <p id="importResultSummary"></p>
+      <div class="preview-errors" id="resultErrors" hidden></div>
+      <button class="btn-primary" id="importResultCloseBtn">Cerrar</button>
     </div>
   </div>
 </div>

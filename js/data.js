@@ -62,23 +62,6 @@ async function deleteProduct(id) {
   }
 }
 
-async function insertProductsBatch(products) {
-  const rows = products.map(({ nombre, sku, stock, stockMinimo }) => ({
-    nombre,
-    sku,
-    stock,
-    stock_minimo: stockMinimo,
-  }));
-
-  const { data, error } = await db
-    .from("products")
-    .insert(rows)
-    .select("id, nombre, sku, stock, stock_minimo");
-
-  if (error) throw error;
-  return data.map(mapRow);
-}
-
 async function upsertProductsChunk(rows) {
   const payload = rows.map(({ nombre, sku, stock, stockMinimo }) => ({
     nombre,
