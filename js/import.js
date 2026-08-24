@@ -36,9 +36,11 @@ let importValidRows = [];
 let importInvalidRows = [];
 let importRun = 0;
 let importHeaderRowIndex = 0;
+let importCommittedSkus = new Set();
 
 function openImportModal() {
   importRun++;
+  importCommittedSkus = new Set();
   importFileInput.value = "";
   importFileName.textContent = "Ningún archivo seleccionado";
   importFileError.hidden = true;
@@ -157,7 +159,7 @@ function updateMappingContinueState() {
   mappingContinueBtn.disabled = mapping.nombre === undefined || mapping.sku === undefined;
 }
 
-mappingContinueBtn.addEventListener("click", () => {
+mappingContinueBtn.addEventListener("click", async () => {
   const mapping = getCurrentMapping();
   const mergeMode = document.querySelector('input[name="mergeMode"]:checked').value;
 
@@ -167,6 +169,17 @@ mappingContinueBtn.addEventListener("click", () => {
     headerToField[header] = found ? found[0] : "";
   });
   saveMapping(headerToField);
+
+  mappingContinueBtn.disabled = true;
+  try {
+    await fetchProducts();
+  } catch (error) {
+    console.error(error);
+    mappingContinueBtn.disabled = false;
+    showToast("No se pudo comprobar el inventario actual. Inténtalo de nuevo.", "error");
+    return;
+  }
+  mappingContinueBtn.disabled = false;
 
   buildPreview(mapping, mergeMode);
   showImportState("preview");
@@ -179,7 +192,7 @@ function parseNonNegativeInt(value) {
   const trimmed = typeof value === "string" ? value.trim() : value;
   if (trimmed === "") return null;
   const n = Number(trimmed);
-  if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) return NaN;
+  if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n) || n > 2147483647) return NaN;
   return n;
 }
 
@@ -198,6 +211,7 @@ function buildPreview(mapping, mergeMode) {
 
     if (!rawNombre) { importInvalidRows.push({ rowNumber, reason: "sin nombre" }); return; }
     if (!rawSku) { importInvalidRows.push({ rowNumber, reason: "sin SKU" }); return; }
+    if (importCommittedSkus.has(rawSku)) return; // ya se importó correctamente en un intento anterior de esta sesión
 
     const stockParsed = parseNonNegativeInt(mapping.stock !== undefined ? row[mapping.stock] : "");
     if (Number.isNaN(stockParsed)) { importInvalidRows.push({ rowNumber, reason: "stock inválido" }); return; }
@@ -242,7 +256,7 @@ function renderPreview() {
   previewSummary.textContent = `${newCount} nuevas · ${updateCount} actualizaciones · ${importInvalidRows.length} con error`;
 
   previewBody.innerHTML = "";
-  importValidRows.slice(0, 10).forEach((row) => {
+  importValidRows.forEach((row) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(row.nombre)}</td>
@@ -252,11 +266,6 @@ function renderPreview() {
     `;
     previewBody.appendChild(tr);
   });
-  if (importValidRows.length > 10) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="4" class="table-loading">y ${importValidRows.length - 10} filas más</td>`;
-    previewBody.appendChild(tr);
-  }
   if (importValidRows.length === 0) {
     previewBody.innerHTML = `<tr><td colspan="4" class="table-loading">No hay filas válidas para importar.</td></tr>`;
   }
@@ -313,6 +322,7 @@ async function runImport() {
         if (existingIndex >= 0) PRODUCTS[existingIndex] = product;
         else PRODUCTS.push(product);
       });
+      chunk.forEach((row) => importCommittedSkus.add(row.sku));
 
       processed += chunk.length;
       const pct = Math.round((processed / importValidRows.length) * 100);

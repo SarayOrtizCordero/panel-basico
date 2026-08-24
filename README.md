@@ -2,7 +2,7 @@
 
 Panel de inventario funcional con login y datos persistidos en una base de
 datos real (Supabase / Postgres). Sin build step — HTML + CSS + JS vainilla,
-más el SDK de Supabase cargado por CDN.
+más el SDK de Supabase y SheetJS (para leer archivos Excel/CSV) cargados por CDN.
 
 ## Funcionalidades
 
@@ -85,7 +85,7 @@ basico/
     ├── auth.js              Login, logout y qué pantalla se muestra
     ├── theme.js              Toggle de modo claro/oscuro
     ├── app.js                Render de la tabla, dashboard y eventos
-    └── import.js             Simulación de importación desde Excel
+    └── import.js             Importación real desde Excel (parseo, mapeo, vista previa y envío por lotes)
 ```
 
 ## Notas para extender
