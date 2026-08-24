@@ -25,9 +25,12 @@ más el SDK de Supabase cargado por CDN.
   panel.
 - **Eliminar producto:** botón de papelera en cada fila, con confirmación
   antes de borrar de verdad en la base de datos.
-- **Importar desde Excel (simulado):** botón que abre un modal, simula la
-  subida de un archivo con una barra de progreso de ~2s y **inserta de
-  verdad** entre 15 y 20 productos generados en la base de datos.
+- **Importar desde Excel:** sube un `.xlsx`, `.xls` o `.csv` real, indica
+  qué columna es el nombre/SKU/stock/stock mínimo (el mapeo se recuerda
+  para la próxima vez), revisa una vista previa con los productos nuevos y
+  las actualizaciones antes de confirmar, y elige si el stock de productos
+  ya existentes se sustituye o se suma al actual. Las filas inválidas se
+  listan sin bloquear la importación del resto.
 - **Alerta de stock bajo:** cuando `stock <= stockMinimo`, la fila muestra un
   borde izquierdo rojo pulsante y la insignia "¡Stock Bajo!".
 
@@ -107,7 +110,7 @@ basico/
   Security del esquema (`to authenticated`), no la key.
 - No hay pestaña de proveedores ni variantes — eso empieza en el nivel
   [`intermedio/`](https://github.com/SarayOrtizCordero/panel-intermedio/blob/main/README.md).
-  La importación desde Excel de este nivel es una simulación (ver
-  Funcionalidades); intermedio añade además proveedores y variantes reales.
+  La importación desde Excel de este nivel es real y permite mapeo de
+  columnas; intermedio añade además proveedores y variantes reales.
   Este nivel está pensado
   para quedarse simple a propósito.
