@@ -35,6 +35,7 @@ let importDataRows = [];
 let importValidRows = [];
 let importInvalidRows = [];
 let importRun = 0;
+let importHeaderRowIndex = 0;
 
 function openImportModal() {
   importRun++;
@@ -73,13 +74,17 @@ importFileInput.addEventListener("change", async () => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
 
-    const nonEmptyRows = rows.filter((row) => row.some((cell) => String(cell).trim() !== ""));
-    if (nonEmptyRows.length < 2) {
+    const headerIndex = rows.findIndex((row) => row.some((cell) => String(cell).trim() !== ""));
+    const dataRows = headerIndex === -1 ? [] : rows.slice(headerIndex + 1);
+    const hasData = dataRows.some((row) => row.some((cell) => String(cell).trim() !== ""));
+
+    if (headerIndex === -1 || !hasData) {
       throw new Error("El archivo no tiene filas de datos, solo la cabecera (o está vacío).");
     }
 
-    importHeaders = nonEmptyRows[0].map((h) => String(h).trim());
-    importDataRows = nonEmptyRows.slice(1);
+    importHeaders = rows[headerIndex].map((h) => String(h).trim());
+    importDataRows = dataRows;
+    importHeaderRowIndex = headerIndex;
     renderMappingStep();
     showImportState("mapping");
   } catch (error) {
@@ -185,7 +190,7 @@ function buildPreview(mapping, mergeMode) {
   const indexBySku = new Map();
 
   importDataRows.forEach((row, i) => {
-    const rowNumber = i + 2; // fila 1 = cabecera
+    const rowNumber = importHeaderRowIndex + i + 2; // fila real del archivo (la cabecera ocupa la fila importHeaderRowIndex + 1)
     if (row.every((cell) => String(cell).trim() === "")) return;
 
     const rawNombre = mapping.nombre !== undefined ? String(row[mapping.nombre] ?? "").trim() : "";
