@@ -120,11 +120,46 @@ function saveMapping(headerToField) {
   }
 }
 
+const AUTO_MAPPING_RULES = [
+  { field: "stockMinimo", keywords: ["minimo"] },
+  { field: "sku", keywords: ["sku", "codigo", "referencia", "ref"] },
+  { field: "stock", keywords: ["stock", "cantidad", "existencias", "unidades"] },
+  { field: "nombre", keywords: ["nombre", "producto", "articulo", "item"] },
+];
+
+function normalizeForMatching(text) {
+  return String(text)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+}
+
+function guessColumnMapping(headers) {
+  const guess = {};
+  const claimedFields = new Set();
+
+  headers.forEach((header) => {
+    const normalized = normalizeForMatching(header);
+    const rule = AUTO_MAPPING_RULES.find(
+      (r) => !claimedFields.has(r.field) && r.keywords.some((keyword) => normalized.includes(keyword))
+    );
+    if (rule) {
+      guess[header] = rule.field;
+      claimedFields.add(rule.field);
+    } else {
+      guess[header] = "";
+    }
+  });
+
+  return guess;
+}
+
 function renderMappingStep() {
   const saved = loadSavedMapping();
+  const guessed = saved ? null : guessColumnMapping(importHeaders);
   mappingList.innerHTML = "";
 
-  const options = [`<option value="">Ignorar esta columna</option>`]
+  const options = [`<option value="">No se usa este dato</option>`]
     .concat(IMPORT_FIELDS.map((f) => `<option value="${f.key}">${f.label}</option>`))
     .join("");
 
@@ -136,7 +171,7 @@ function renderMappingStep() {
       <select class="field-input mapping-select" data-column-index="${index}">${options}</select>
     `;
     mappingList.appendChild(row);
-    row.querySelector("select").value = saved ? saved[header] || "" : "";
+    row.querySelector("select").value = saved ? saved[header] || "" : guessed[header] || "";
   });
 
   mappingList.querySelectorAll(".mapping-select").forEach((select) => {
