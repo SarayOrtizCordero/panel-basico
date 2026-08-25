@@ -121,8 +121,8 @@ function saveMapping(headerToField) {
 }
 
 const AUTO_MAPPING_RULES = [
-  { field: "stockMinimo", keywords: ["minimo"] },
-  { field: "sku", keywords: ["sku", "codigo", "referencia", "ref"] },
+  { field: "stockMinimo", keywords: ["minim"], wholeWords: ["min"] },
+  { field: "sku", keywords: ["sku", "referencia"] },
   { field: "stock", keywords: ["stock", "cantidad", "existencias", "unidades"] },
   { field: "nombre", keywords: ["nombre", "producto", "articulo", "item"] },
 ];
@@ -134,15 +134,21 @@ function normalizeForMatching(text) {
     .replace(/\p{Diacritic}/gu, "");
 }
 
+function ruleMatches(rule, normalized) {
+  if (rule.keywords.some((keyword) => normalized.includes(keyword))) return true;
+  if (rule.wholeWords) {
+    return rule.wholeWords.some((word) => new RegExp(`\\b${word}\\b`).test(normalized));
+  }
+  return false;
+}
+
 function guessColumnMapping(headers) {
   const guess = {};
   const claimedFields = new Set();
 
   headers.forEach((header) => {
     const normalized = normalizeForMatching(header);
-    const rule = AUTO_MAPPING_RULES.find(
-      (r) => !claimedFields.has(r.field) && r.keywords.some((keyword) => normalized.includes(keyword))
-    );
+    const rule = AUTO_MAPPING_RULES.find((r) => !claimedFields.has(r.field) && ruleMatches(r, normalized));
     if (rule) {
       guess[header] = rule.field;
       claimedFields.add(rule.field);
