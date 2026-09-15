@@ -1,15 +1,22 @@
 # Panel de Inventario — Básico
 
-Panel de inventario funcional con login y datos persistidos en una base de
-datos real (Supabase / Postgres). Sin build step — HTML + CSS + JS vainilla,
-más el SDK de Supabase y SheetJS (para leer archivos Excel/CSV) cargados por CDN.
+Panel de inventario funcional con login y datos persistidos en el propio
+navegador (`localStorage`). Sin build step — HTML + CSS + JS vainilla, más
+SheetJS (para leer archivos Excel/CSV) cargado por CDN.
+
+> **Sin backend por ahora:** este panel usaba Supabase (Postgres + Auth real),
+> pero el proyecto gratuito se quedó sin plan y se pausó. Mientras se decide
+> si se retoma esa migración, el login usa un usuario y contraseña fijos
+> comprobados en el propio código (`js/config.js`) y los productos se guardan
+> en `localStorage` en vez de en una base de datos — o sea, sin seguridad real
+> y los datos solo viven en este navegador. `supabase/schema.sql` se deja tal
+> cual para cuando se retome esa migración.
 
 ## Funcionalidades
 
 - **Acceso con usuario y contraseña:** el inventario solo es visible tras
-  iniciar sesión (Supabase Auth). Sin sesión no se puede ni leer ni escribir
-  ningún dato — lo aplica la Row Level Security de la base de datos, no solo
-  la pantalla de login.
+  iniciar sesión. Por ahora es una comprobación fija en el propio navegador
+  (ver nota de arriba), no una autenticación real de servidor.
 - **Modo claro / oscuro:** botón en la cabecera que cambia el tema y lo
   recuerda entre visitas (`localStorage`); si el usuario nunca lo ha tocado,
   se usa el tema del sistema operativo.
@@ -34,40 +41,13 @@ más el SDK de Supabase y SheetJS (para leer archivos Excel/CSV) cargados por CD
 - **Alerta de stock bajo:** cuando `stock <= stockMinimo`, la fila muestra un
   borde izquierdo rojo pulsante y la insignia "¡Stock Bajo!".
 
-## Configuración de Supabase (una sola vez)
+## Cómo entrar
 
-1. Crea una cuenta y un proyecto gratuito en [supabase.com](https://supabase.com).
-2. En el proyecto, ve a **SQL Editor** → pega y ejecuta todo el contenido de
-   [`supabase/schema.sql`](supabase/schema.sql). Esto crea la tabla
-   `products`, activa la Row Level Security y carga los 10 productos de
-   ejemplo.
-3. Ve a **Authentication → Providers → Email** y desactiva **"Allow new
-   users to sign up"**. Importante: sin este paso, cualquiera con la anon
-   key podría crearse una cuenta propia y entrar al panel.
-4. Ve a **Authentication → Users → Add user** y crea la cuenta con la que
-   entrará el cliente (correo + contraseña). Ese es el login del panel —
-   no hay registro público.
-5. Ve a **Project Settings → API** y copia:
-   - **Project URL**
-   - **anon / public key**
-6. Pégalos en [`js/config.js`](js/config.js), sustituyendo los marcadores
-   `TU-PROYECTO` y `TU-ANON-KEY`.
-
-> **Si ya tenías este proyecto Supabase creado antes de añadir el borrado de
-> productos:** `schema.sql` no se vuelve a ejecutar solo. Ve a **SQL Editor**
-> y ejecuta únicamente esto una vez:
->
-> ```sql
-> create policy "Usuarios autenticados pueden eliminar productos"
->   on public.products for delete
->   to authenticated
->   using (true);
->
-> grant delete on public.products to authenticated;
-> ```
-
-Con eso, abrir `index.html` (con doble clic o sirviéndolo con
-`python -m http.server 8000`) ya pide login y lee/escribe en Supabase.
+Abre `index.html` (con doble clic o sirviéndolo con
+`python -m http.server 8000`) y entra con el usuario y contraseña definidos en
+[`js/config.js`](js/config.js) (`DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD`).
+Cámbialos ahí si quieres otras credenciales — no hay registro ni servidor,
+solo se comparan en el navegador.
 
 ## Estructura
 
@@ -77,11 +57,10 @@ basico/
 ├── css/
 │   └── styles.css        Variables de color (claro/oscuro), login, tarjetas, tabla
 ├── supabase/
-│   └── schema.sql         Tabla products + Row Level Security + datos de ejemplo
+│   └── schema.sql         Tabla products + Row Level Security (sin usar por ahora, ver nota al principio)
 └── js/
-    ├── config.js           URL y anon key de tu proyecto Supabase (a rellenar)
-    ├── supabaseClient.js   Inicializa el cliente ("db")
-    ├── data.js              fetch/insert/update/delete de productos contra Supabase
+    ├── config.js           Usuario y contraseña fijos del login de demo
+    ├── data.js              fetch/insert/update/delete de productos contra localStorage
     ├── auth.js              Login, logout y qué pantalla se muestra
     ├── theme.js              Toggle de modo claro/oscuro
     ├── app.js                Render de la tabla, dashboard y eventos
@@ -105,9 +84,10 @@ basico/
   `.mi-clase { display: flex }` gana sobre `[hidden]` y lo deja visible
   igualmente (por eso `.login-screen[hidden]` y `.session-loading[hidden]`
   tienen su propio `display: none` explícito).
-- La anon key en `js/config.js` está pensada para ir en el navegador — no es
-  un secreto por sí sola. Quien de verdad protege los datos es la Row Level
-  Security del esquema (`to authenticated`), no la key.
+- El usuario/contraseña de `js/config.js` y los productos de `localStorage`
+  son solo para la demo — cualquiera con el código fuente puede leerlos o
+  editar el storage del navegador. No uses este login tal cual con datos
+  reales.
 - No hay pestaña de proveedores ni variantes — eso empieza en el nivel
   [`intermedio/`](https://github.com/SarayOrtizCordero/panel-intermedio/blob/main/README.md).
   La importación desde Excel de este nivel es real y permite mapeo de
